@@ -56,9 +56,13 @@ The codebase is structured as follows:
 * Python 3.6 or above
 * Mujoco 2.0
 
+```bash
+$ sudo apt-get update
+$ sudo apt-get upgrade
+```
 ### MuJoCo Installation
 
-1. Create the `~/.mujoco` folder in your home directory. Add your MuJoCo license `mjkey.txt` into the mujoco folder. If you do not have a license key, ask one of the lab members for it.
+1. Create the `~/.mujoco` folder in your home directory. Then, you need to get a MuJoCo license from this website: https://www.roboti.us/license.html. Click the "Activation Key" link, and it will download an `mjket.txt`. Add your MuJoCo license `mjkey.txt` into the mujoco folder.
 
 2. Install mujoco 2.0 and add the following environment variables into `~/.bashrc` or `~/.zshrc`
 
@@ -82,6 +86,13 @@ $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia-418
 1. Install python dependencies. This requirements file is out of date, so you'll probably
 run into import errors and have to install the missing packages. Sorry!
 
+Before the pip install, you should install the following.
+```bash
+pip3 install --upgrade pip (prevents a skbuild error)
+sudo apt-get install libosmesa6-dev (prevents GL/OSMesa.h missing error)
+sudo apt install libgl1-mesa-dev (prevents "/usr/bin/ld: cannot find -lGL" error)
+sudo apt-get install patchelf (prevents can't find patchelf error)
+```
 ```bash
 # Run the rest for both Ubuntu and macOS
 $ pip install -r requirements.txt
