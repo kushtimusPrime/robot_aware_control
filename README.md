@@ -89,6 +89,7 @@ run into import errors and have to install the missing packages. Sorry!
 
 Before the pip install, you should install the following.
 ```bash
+sudo apt install python3-pip
 pip3 install --upgrade pip (prevents a skbuild error)
 sudo apt-get install libosmesa6-dev (prevents GL/OSMesa.h missing error)
 sudo apt install libgl1-mesa-dev (prevents "/usr/bin/ld: cannot find -lGL" error)
