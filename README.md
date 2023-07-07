@@ -69,6 +69,7 @@ $ sudo apt-get upgrade
 ```bash
 # download mujoco 2.0 from https://www.roboti.us/index.html
 $ wget https://www.roboti.us/download/mujoco200_linux.zip -O mujoco.zip
+$ sudo apt-get install unzip
 $ unzip mujoco.zip -d ~/.mujoco
 $ mv ~/.mujoco/mujoco200_linux ~/.mujoco/mujoco200
 
