@@ -97,7 +97,7 @@ sudo apt-get install patchelf (prevents can't find patchelf error)
 ```
 ```bash
 # Run the rest for both Ubuntu and macOS
-$ pip install -r requirements.txt
+$ pip3 install -r requirements.txt
 ```
 
 ## Running Experiments
