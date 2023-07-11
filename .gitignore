@@ -156,3 +156,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 ckpt_eval
+
+hdf5/
+*.tar.gz
