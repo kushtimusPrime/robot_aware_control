@@ -5,6 +5,7 @@ Run `pip install pybullet==1.9.5`.
 """
 
 import numpy as np
+import os
 
 try:
     import pybullet as p
@@ -15,8 +16,8 @@ except ImportError:
 from os.path import join as pjoin
 
 import src.env.robotics.controllers.transform_utils as T
-from src.env.robotics.controllers import Controller
-
+#from src.env.robotics.controllers import Controller
+from .controller import Controller
 
 class SawyerIKController(Controller):
     """
@@ -112,10 +113,13 @@ class SawyerIKController(Controller):
         p.connect(p.DIRECT)
         p.resetSimulation()
 
+        print(os.path.dirname(__file__))
         # get paths to urdfs
-        self.robot_urdf = pjoin(
-            self.bullet_data_path, "sawyer_description/urdf/sawyer_arm.urdf"
-        )
+        #self.robot_urdf = pjoin(
+        #    self.bullet_data_path, "sawyer_description/urdf/sawyer_arm.urdf"
+        #)
+
+        self.robot_urdf = os.path.join(os.path.dirname(__file__),'../assets/bullet_data/sawyer_description/urdf/sawyer_arm.urdf')
 
         # load the urdfs
         self.ik_robot = p.loadURDF(self.robot_urdf, (0, 0, 0.9), useFixedBase=1)

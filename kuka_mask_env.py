@@ -11,6 +11,7 @@ import imageio
 class KukaMaskEnv(RobotEnv):
     def __init__(self):
         model_path = os.path.join("kuka", "robot.xml")
+        print(model_path)
         initial_qpos = None
         n_actions = 1
         n_substeps = 1
@@ -38,25 +39,25 @@ class KukaMaskEnv(RobotEnv):
         joint_references = [self.sim.model.get_joint_qpos_addr(x) for x in self._joints]
         # run qpos trajectory
         gif = []
-        while True:
-            for i, qpos in enumerate(qpos_data):
-                grip_state = gripper_data[i]
-                self.sim.data.qpos[joint_references] = qpos
-                eef_pos = grip_state[:3]
+        #while True:
+        for i, qpos in enumerate(qpos_data):
+            grip_state = gripper_data[i]
+            self.sim.data.qpos[joint_references] = qpos
+            eef_pos = grip_state[:3]
 
-                eef_site = self.sim.model.body_name2id("eef_body")
-                self.sim.model.body_pos[eef_site] = eef_pos
-                self.sim.forward()
-                self.render("human")
-                # img = self.render("rgb_array")
-                # mask = self.get_robot_mask()
-                # real_img = real_imgs[i]
-                # mask_img = real_img.copy()
-                # mask_img[mask] = (0, 255, 255)
-                # comparison = mask_img
-                # # comparison = np.concatenate([img, real_img, mask_img], axis=1)
-                # gif.append(comparison)
-            # imageio.mimwrite(f"{traj_name}_mask.gif", gif)
+            eef_site = self.sim.model.body_name2id("eef_body")
+            self.sim.model.body_pos[eef_site] = eef_pos
+            self.sim.forward()
+            #self.render("human")
+            img = self.render("rgb_array")
+            mask = self.get_robot_mask()
+            real_img = real_imgs[i]
+            mask_img = real_img.copy()
+            mask_img[mask] = (0, 255, 255)
+            comparison = mask_img
+            comparison = np.concatenate([img, real_img, mask_img], axis=1)
+            gif.append(comparison)
+        imageio.mimwrite(f"{traj_name}_mask.gif", gif)
 
     def _sample_goal(self):
         pass
@@ -98,9 +99,9 @@ if __name__ == "__main__":
     import tensorflow as tf
     from tqdm import tqdm
     print("Hello world")
-    exit()
-    robonet_root = "/media/ed/hdd/Datasets/Robonet/hdf5/"
-    metadata_path = "/media/ed/hdd/Datasets/Robonet/hdf5/meta_data.pkl"
+
+    robonet_root = "../RoboNet/hdf5/"
+    metadata_path = "../RoboNet/hdf5/meta_data.pkl"
     num_test = 10
     hparams = tf.contrib.training.HParams(**default_loader_hparams())
     hparams.img_size = [120, 160]
@@ -110,6 +111,8 @@ if __name__ == "__main__":
     kuka_df = df.loc["kuka" == df["robot"]]
     kuka1 = ["new_kuka/" in x for x in kuka_df["object_batch"]]
     kuka_subset = kuka_df[kuka1]
+
+    
 
     camera_extrinsics = np.array(
         [
@@ -138,6 +141,9 @@ if __name__ == "__main__":
 
     rand_sawyer = kuka_subset.sample(num_test)
     meta_data = load_metadata(robonet_root)
+
+    print("Madje it")
+    
     # load qpos, gripper states, workspace bounds
     for traj_name in tqdm(rand_sawyer.index, "generating gifs"):
         f_metadata = df.loc[traj_name]

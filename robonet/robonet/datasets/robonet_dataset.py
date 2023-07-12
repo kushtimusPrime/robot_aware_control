@@ -1,7 +1,7 @@
-from robonet.robonet.datasets.base_dataset import BaseVideoDataset
-from robonet.robonet.datasets.util.hdf5_loader import load_data, default_loader_hparams
+from robonet.datasets.base_dataset import BaseVideoDataset
+from robonet.datasets.util.hdf5_loader import load_data, default_loader_hparams
 from tensorflow.contrib.training import HParams
-from robonet.robonet.datasets.util.dataset_utils import color_augment, split_train_val_test
+from robonet.datasets.util.dataset_utils import color_augment, split_train_val_test
 import numpy as np
 import tensorflow as tf
 import copy

@@ -7,6 +7,8 @@ from gym import error, spaces
 from PIL import Image as im
 import h5py
 import io
+from scipy.spatial.transform.rotation import Rotation
+
 
 DEFAULT_SIZE = 500
 DEVICE_ID = -1
@@ -46,6 +48,29 @@ class KukaRobotPixel():
         self._camera_name = "main_cam"
         self._joints = [f"joint_{i}" for i in range(1,8)]
 
+        camera_extrinsics = np.array(
+        [
+            [-0.01290487, 0.62117762, -0.78356355, 1.21061856],
+            [1, 0.00660994, -0.01122798, 0.01680913],
+            [-0.00179526, -0.78364193, -0.62121019, 0.47401633],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+        rot_matrix = camera_extrinsics[:3, :3]
+        cam_pos = camera_extrinsics[:3, 3]
+        rel_rot = Rotation.from_quat([0, 1, 0, 0])  # calculated
+        cam_rot = Rotation.from_matrix(rot_matrix) * rel_rot
+        cam_id = 0
+        offset = [0, 0, 0]
+        self.sim.model.cam_pos[cam_id] = cam_pos + offset
+        cam_quat = cam_rot.as_quat()
+        self.sim.model.cam_quat[cam_id] = [
+            cam_quat[3],
+            cam_quat[0],
+            cam_quat[1],
+            cam_quat[2],
+        ]
+        self.sim.forward()
+
     def baseRender(
         self,
         mode="human",
@@ -74,8 +99,12 @@ class KukaRobotPixel():
                 width=self._img_width,
                 height=self._img_height,
                 camera_name=self._camera_name,
-                segmentation=segmentation,
+                # segmentation=segmentation,
             )
+            out_image = im.fromarray(out)
+            out_image.save('initial_render.png')
+            print(out.shape)
+            print("Out shape")
             return out[::-1, ::-1]
         elif mode == "human":
             self.baseRender(mode)
@@ -87,6 +116,8 @@ class KukaRobotPixel():
         """
         # returns a binary mask where robot pixels are True
         seg = self.render("rgb_array", segmentation=True)  # flip the camera
+        print(seg.shape)
+        print("Post seg")
         types = seg[:, :, 0]
         ids = seg[:, :, 1]
         geoms = types == self.mj_const.OBJ_GEOM
@@ -119,10 +150,7 @@ class KukaRobotPixel():
         """Initial configuration of the environment. Can be used to configure initial state
         and extract information from the simulation.
         """
-        print(initial_qpos.shape)
-        for name, value in initial_qpos.items():
-            self.sim.data.set_joint_qpos(name, value)
-        self.sim.forward()
+        pass
 
     def _sample_goal(self):
         """Samples a new goal and returns it."""
@@ -140,6 +168,9 @@ def main():
         buf = f.read()
 
     with h5py.File(io.BytesIO(buf)) as hf:
+        print(hf['env'].keys())
+        print(hf['env']['cam0_video']['frames'])
+        print(hf['env']['state'])
         the_qpos = hf['env']['qpos'][:]
     print(the_qpos)
     print("Earl xit")
@@ -149,6 +180,7 @@ def main():
     n_substeps = 1
     seed = None
     kuka_robot_pixel_test = KukaRobotPixel(model_path, initial_qpos, n_actions, n_substeps, seed=seed)
+    
     maybe_kuka_photo = kuka_robot_pixel_test.get_robot_mask()
     data = im.fromarray(maybe_kuka_photo)
     data.save('test.png')
